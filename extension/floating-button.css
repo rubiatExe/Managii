@@ -1,9 +1,10 @@
 /* Managify Floating Button */
 #managify-floating-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 999999;
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 2147483647 !important;
+    /* Max z-index */
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
@@ -13,7 +14,7 @@
     font-weight: 600;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    display: flex;
+    display: flex !important;
     align-items: center;
     gap: 8px;
     transition: all 0.3s ease;
@@ -41,14 +42,31 @@
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
 }
 
 #managify-floating-btn svg {

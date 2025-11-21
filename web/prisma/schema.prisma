@@ -13,6 +13,9 @@ model Job {
   company     String
   description String
   url         String   @unique
+  location    String?  // Job location
+  category    String?  // Job category: sde, aiml, cv, nlp, robo
+  isRelevant  Boolean  @default(true) // Filter flag for relevance
   status      String   @default("Applied") // Applied, Interviewing, Offer, Rejected
   fitScore    Int?
   analysis    String?  // JSON string for detailed analysis (strengths, weaknesses)

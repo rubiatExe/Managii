@@ -3,23 +3,35 @@ console.log("Managify background script loaded.");
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "saveJob") {
-    // TODO: Send data to Web App API
     console.log("Received job data:", request.data);
+
+    // Add timeout protection
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
     fetch('http://localhost:3000/api/jobs', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(request.data)
+      body: JSON.stringify(request.data),
+      signal: controller.signal
     })
       .then(response => {
+        clearTimeout(timeoutId);
+        console.log('Response status:', response.status);
+
         if (response.status === 409) {
           // Duplicate job
           return response.json().then(data => {
             throw new Error('Job already saved');
           });
         }
+
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+
         return response.json();
       })
       .then(data => {
@@ -28,7 +40,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       })
       .catch((error) => {
         console.error('Error:', error);
-        sendResponse({ success: false, error: error.message || error.toString() });
+
+        let errorMessage = error.message || error.toString();
+        if (error.name === 'AbortError') {
+          errorMessage = 'Request timeout - is the backend running?';
+        } else if (errorMessage.includes('fetch')) {
+          errorMessage = 'Cannot connect to localhost:3000 - check if npm run dev is running';
+        }
+
+        sendResponse({ success: false, error: errorMessage });
       });
 
     return true; // Keep the message channel open for async response

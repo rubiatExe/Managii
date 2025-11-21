@@ -41,6 +41,8 @@ interface Job {
     fitScore: number | null;
     createdAt: string;
     order?: number;
+    location?: string | null;
+    category?: string | null;
 }
 
 interface JobTableProps {
@@ -96,6 +98,21 @@ function SortableJobRow({ job, onDelete }: { job: Job; onDelete: (id: string) =>
                 )}
             </TableCell>
             <TableCell className="cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
+                {job.location || <span className="text-gray-400">N/A</span>}
+            </TableCell>
+            <TableCell className="cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
+                {job.category ? (
+                    <Badge style={{
+                        backgroundColor: getCategoryColor(job.category),
+                        color: 'white'
+                    }}>
+                        {getCategoryName(job.category)}
+                    </Badge>
+                ) : (
+                    <span className="text-gray-400">N/A</span>
+                )}
+            </TableCell>
+            <TableCell className="cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
                 {new Date(job.createdAt).toLocaleDateString()}
             </TableCell>
             <TableCell className="text-right">
@@ -124,6 +141,29 @@ function SortableJobRow({ job, onDelete }: { job: Job; onDelete: (id: string) =>
             </TableCell>
         </TableRow>
     );
+}
+
+// Helper functions for category display
+function getCategoryColor(category: string): string {
+    const colors: Record<string, string> = {
+        'sde': '#3b82f6',      // blue
+        'aiml': '#8b5cf6',     // purple
+        'cv': '#ec4899',       // pink
+        'nlp': '#10b981',      // green
+        'robo': '#f59e0b'      // amber
+    };
+    return colors[category] || '#6b7280'; // gray
+}
+
+function getCategoryName(category: string): string {
+    const names: Record<string, string> = {
+        'sde': 'Software Dev',
+        'aiml': 'AI/ML',
+        'cv': 'Computer Vision',
+        'nlp': 'NLP',
+        'robo': 'Robotics'
+    };
+    return names[category] || 'Other';
 }
 
 export function JobTable({ jobs: initialJobs }: JobTableProps) {
@@ -214,6 +254,8 @@ export function JobTable({ jobs: initialJobs }: JobTableProps) {
                             <TableHead>Company</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Fit Score</TableHead>
+                            <TableHead>Location</TableHead>
+                            <TableHead>Category</TableHead>
                             <TableHead>Date Applied</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
@@ -241,6 +283,8 @@ export function JobTable({ jobs: initialJobs }: JobTableProps) {
                                 <TableHead>Company</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Fit Score</TableHead>
+                                <TableHead>Location</TableHead>
+                                <TableHead>Category</TableHead>
                                 <TableHead>Date Applied</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -248,7 +292,7 @@ export function JobTable({ jobs: initialJobs }: JobTableProps) {
                         <TableBody>
                             {jobs.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center h-24">
+                                    <TableCell colSpan={9} className="text-center h-24">
                                         No jobs tracked yet. Use the Chrome Extension to add some!
                                     </TableCell>
                                 </TableRow>
