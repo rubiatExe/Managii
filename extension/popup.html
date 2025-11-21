@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Managify</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 10px;
+      font-family: sans-serif;
+    }
+    h1 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    button {
+      width: 100%;
+      padding: 8px;
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0051a2;
+    }
+    #status {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Managify Job Tracker</h1>
+  <div id="job-info">
+    <p>Click below to scrape and save this job.</p>
+  </div>
+  <button id="save-btn">Save Job</button>
+  <div id="status"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
