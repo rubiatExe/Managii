@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import prisma from "@/lib/prisma"; // not used client side, keep for type only
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,18 +19,15 @@ interface Job {
     analysis: string | null;
 }
 
-interface JobPageProps {
-    params: { id: string };
-}
-
-export default function JobPage({ params }: JobPageProps) {
-    const { id } = params;
+export default function JobPage() {
+    const params = useParams();
+    const id = params?.id as string;
     const [job, setJob] = useState<Job | null>(null);
     const [loading, setLoading] = useState(true);
 
     const fetchJob = async () => {
         try {
-            const res = await fetch(`/api/jobs?id=${id}`);
+            const res = await fetch(`/api/jobs/${id}`);
             const data = await res.json();
             if (data.success && data.job) {
                 setJob(data.job);

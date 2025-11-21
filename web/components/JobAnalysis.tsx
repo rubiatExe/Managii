@@ -21,9 +21,25 @@ interface JobAnalysisProps {
 }
 
 export function JobAnalysis({ jobId, initialAnalysis, fitScore }: JobAnalysisProps) {
-    const [analysis, setAnalysis] = useState<AnalysisResult | null>(
-        initialAnalysis ? JSON.parse(initialAnalysis) : null
-    );
+    const [analysis, setAnalysis] = useState<AnalysisResult | null>(() => {
+        if (!initialAnalysis) return null;
+        try {
+            const parsed = JSON.parse(initialAnalysis);
+            // Validate schema
+            if (
+                typeof parsed.fitScore === 'number' &&
+                Array.isArray(parsed.strengths) &&
+                parsed.strengths.length > 0 &&
+                typeof parsed.strengths[0] === 'object' && // Check if strength is object (new format)
+                Array.isArray(parsed.gaps)
+            ) {
+                return parsed as AnalysisResult;
+            }
+            return null; // Invalid or legacy format
+        } catch (e) {
+            return null;
+        }
+    });
     const [loading, setLoading] = useState(false);
 
     const handleAnalyze = async () => {
