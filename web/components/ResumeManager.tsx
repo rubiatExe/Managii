@@ -51,11 +51,12 @@ export function ResumeManager() {
                 fetchResumes();
                 formElement.reset();
             } else {
-                alert("Upload failed");
+                const data = await res.json();
+                alert(data.error || "Upload failed");
             }
         } catch (error) {
             console.error('Upload error:', error);
-            alert("Error uploading resume");
+            alert("Error uploading resume: " + (error instanceof Error ? error.message : "Unknown error"));
         } finally {
             setUploading(false);
         }
