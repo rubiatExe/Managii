@@ -39,6 +39,14 @@ export function ResumeManager() {
         try {
             const formElement = e.currentTarget;
             const formData = new FormData(formElement);
+            const file = formData.get('file') as File;
+
+            // Check file size (limit to 4MB for Vercel Serverless)
+            if (file && file.size > 4 * 1024 * 1024) {
+                alert("File is too large. Maximum size is 4MB.");
+                setUploading(false);
+                return;
+            }
 
             // We send the FormData directly to the API
             // The API will handle parsing PDF or text files
@@ -51,8 +59,20 @@ export function ResumeManager() {
                 fetchResumes();
                 formElement.reset();
             } else {
-                const data = await res.json();
-                alert(data.error || "Upload failed");
+                // Handle non-JSON errors (like 413 Payload Too Large which returns HTML)
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const data = await res.json();
+                    alert(data.error || "Upload failed");
+                } else {
+                    const text = await res.text();
+                    if (res.status === 413) {
+                        alert("File is too large (Max 4MB)");
+                    } else {
+                        console.error("Server error:", text);
+                        alert(`Upload failed (Status ${res.status})`);
+                    }
+                }
             }
         } catch (error) {
             console.error('Upload error:', error);
