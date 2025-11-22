@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-const pdf = require('pdf-parse');
+
+// Use pdfjs-dist for server-side parsing
+// We need to use the legacy build for Node.js compatibility in some environments
+const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
 
 export async function POST(request: Request) {
     try {
@@ -17,19 +20,41 @@ export async function POST(request: Request) {
             fileName = file.name;
             fileType = file.type;
 
-            const buffer = Buffer.from(await file.arrayBuffer());
+            const arrayBuffer = await file.arrayBuffer();
 
             if (file.type === 'application/pdf') {
                 try {
-                    const data = await pdf(buffer);
-                    content = data.text;
-                } catch (e) {
+                    // Load the PDF document
+                    const loadingTask = pdfjsLib.getDocument({
+                        data: new Uint8Array(arrayBuffer),
+                        useSystemFonts: true,
+                        disableFontFace: true
+                    });
+
+                    const pdf = await loadingTask.promise;
+                    let fullText = '';
+
+                    // Extract text from all pages
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items
+                            .map((item: any) => item.str)
+                            .join(' ');
+                        fullText += pageText + '\n';
+                    }
+
+                    content = fullText;
+                } catch (e: any) {
                     console.error("PDF parse error:", e);
-                    return NextResponse.json({ success: false, error: "Failed to parse PDF file" }, { status: 400 });
+                    return NextResponse.json({
+                        success: false,
+                        error: "Failed to parse PDF file: " + (e.message || "Unknown error")
+                    }, { status: 400 });
                 }
             } else {
                 // Assume text/markdown
-                content = buffer.toString('utf-8');
+                content = Buffer.from(arrayBuffer).toString('utf-8');
             }
         }
 
