@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
 // Use pdfjs-dist for server-side parsing
-// We need to use the legacy build for Node.js compatibility in some environments
-const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
+// We need to use the legacy build for Node.js compatibility
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 export async function POST(request: Request) {
     try {
