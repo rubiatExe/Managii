@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// Use pdfjs-dist for server-side parsing
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+// Use pdfjs-dist v3 for server-side parsing (more stable in Node.js)
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 
 // Critical fix for Next.js/Vercel: Set worker to dummy to prevent file load error
 // This forces it to run in the main thread or use the fake worker without external file
