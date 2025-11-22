@@ -1,16 +1,40 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+const pdf = require('pdf-parse');
 
 export async function POST(request: Request) {
     try {
         const formData = await request.formData();
         const name = formData.get('name') as string;
-        const content = formData.get('content') as string;
-        const fileName = formData.get('fileName') as string;
-        const fileType = formData.get('fileType') as string;
+        const file = formData.get('file') as File;
+
+        let content = formData.get('content') as string; // Fallback if content is sent directly
+        let fileName = formData.get('fileName') as string;
+        let fileType = formData.get('fileType') as string;
+
+        // If a file is uploaded, parse it
+        if (file && file instanceof File) {
+            fileName = file.name;
+            fileType = file.type;
+
+            const buffer = Buffer.from(await file.arrayBuffer());
+
+            if (file.type === 'application/pdf') {
+                try {
+                    const data = await pdf(buffer);
+                    content = data.text;
+                } catch (e) {
+                    console.error("PDF parse error:", e);
+                    return NextResponse.json({ success: false, error: "Failed to parse PDF file" }, { status: 400 });
+                }
+            } else {
+                // Assume text/markdown
+                content = buffer.toString('utf-8');
+            }
+        }
 
         if (!name || !content) {
-            return NextResponse.json({ success: false, error: "Name and content are required" }, { status: 400 });
+            return NextResponse.json({ success: false, error: "Name and content (or valid file) are required" }, { status: 400 });
         }
 
         // Check if this is the first resume, if so make it master
