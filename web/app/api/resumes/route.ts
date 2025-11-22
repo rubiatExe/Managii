@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-// Use require for pdf-parse to avoid type issues
-const pdf = require('pdf-parse');
+
+// Use pdfjs-dist for server-side parsing
+// We need to use the legacy build for Node.js compatibility
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 export async function POST(request: Request) {
     try {
@@ -18,12 +20,31 @@ export async function POST(request: Request) {
             fileName = file.name;
             fileType = file.type;
 
-            const buffer = Buffer.from(await file.arrayBuffer());
+            const arrayBuffer = await file.arrayBuffer();
 
             if (file.type === 'application/pdf') {
                 try {
-                    const data = await pdf(buffer);
-                    content = data.text;
+                    // Load the PDF document
+                    const loadingTask = pdfjsLib.getDocument({
+                        data: new Uint8Array(arrayBuffer),
+                        useSystemFonts: true,
+                        disableFontFace: true
+                    });
+
+                    const pdf = await loadingTask.promise;
+                    let fullText = '';
+
+                    // Extract text from all pages
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items
+                            .map((item: any) => item.str)
+                            .join(' ');
+                        fullText += pageText + '\n';
+                    }
+
+                    content = fullText;
                 } catch (e: any) {
                     console.error("PDF parse error:", e);
                     return NextResponse.json({
@@ -33,7 +54,7 @@ export async function POST(request: Request) {
                 }
             } else {
                 // Assume text/markdown
-                content = buffer.toString('utf-8');
+                content = Buffer.from(arrayBuffer).toString('utf-8');
             }
         }
 
