@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-    fetch('http://localhost:3000/api/jobs', {
+    fetch('https://managii-dubo-4l4e0tdmh-rubiatexes-projects.vercel.app/api/jobs', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -43,9 +43,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         let errorMessage = error.message || error.toString();
         if (error.name === 'AbortError') {
-          errorMessage = 'Request timeout - is the backend running?';
+          errorMessage = 'Request timeout - check internet connection';
         } else if (errorMessage.includes('fetch')) {
-          errorMessage = 'Cannot connect to localhost:3000 - check if npm run dev is running';
+          errorMessage = 'Cannot connect to Managify server';
         }
 
         sendResponse({ success: false, error: errorMessage });

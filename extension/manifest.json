@@ -8,6 +8,9 @@
     "scripting",
     "storage"
   ],
+  "host_permissions": [
+    "https://managii-dubo-4l4e0tdmh-rubiatexes-projects.vercel.app/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
