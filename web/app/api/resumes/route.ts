@@ -1,68 +1,16 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// Use pdfjs-dist v3 for server-side parsing (more stable in Node.js)
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
-
-// Critical fix for Next.js/Vercel: Set worker to dummy to prevent file load error
-// This forces it to run in the main thread or use the fake worker without external file
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'data:application/javascript;base64,';
-
 export async function POST(request: Request) {
     try {
         const formData = await request.formData();
         const name = formData.get('name') as string;
-        const file = formData.get('file') as File;
-
-        let content = formData.get('content') as string; // Fallback if content is sent directly
-        let fileName = formData.get('fileName') as string;
-        let fileType = formData.get('fileType') as string;
-
-        // If a file is uploaded, parse it
-        if (file && file instanceof File) {
-            fileName = file.name;
-            fileType = file.type;
-
-            const arrayBuffer = await file.arrayBuffer();
-
-            if (file.type === 'application/pdf') {
-                try {
-                    // Load the PDF document
-                    const loadingTask = pdfjsLib.getDocument({
-                        data: new Uint8Array(arrayBuffer),
-                        useSystemFonts: true,
-                        disableFontFace: true
-                    });
-
-                    const pdf = await loadingTask.promise;
-                    let fullText = '';
-
-                    // Extract text from all pages
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        const pageText = textContent.items
-                            .map((item: any) => item.str)
-                            .join(' ');
-                        fullText += pageText + '\n';
-                    }
-
-                    content = fullText;
-                } catch (e: any) {
-                    console.error("PDF parse error:", e);
-                    return NextResponse.json({
-                        success: false,
-                        error: "Failed to parse PDF file: " + (e.message || "Unknown error")
-                    }, { status: 400 });
-                }
-            } else {
-                // Assume text/markdown
-                content = Buffer.from(arrayBuffer).toString('utf-8');
-            }
-        }
+        const content = formData.get('content') as string;
+        const fileName = formData.get('fileName') as string;
+        const fileType = formData.get('fileType') as string;
 
         if (!name || !content) {
-            return NextResponse.json({ success: false, error: "Name and content (or valid file) are required" }, { status: 400 });
+            return NextResponse.json({ success: false, error: "Name and content are required" }, { status: 400 });
         }
 
         // Check if this is the first resume, if so make it master

@@ -40,6 +40,7 @@ export function ResumeManager() {
             const formElement = e.currentTarget;
             const formData = new FormData(formElement);
             const file = formData.get('file') as File;
+            const name = formData.get('name') as string;
 
             // Check file size (limit to 4MB for Vercel Serverless)
             if (file && file.size > 4 * 1024 * 1024) {
@@ -48,11 +49,38 @@ export function ResumeManager() {
                 return;
             }
 
-            // We send the FormData directly to the API
-            // The API will handle parsing PDF or text files
+            let textContent = '';
+
+            // Handle PDF files with client-side parsing
+            if (file.type === 'application/pdf') {
+                const pdfjsLib = await import('pdfjs-dist');
+                pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                // Extract text from all pages
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    const text = content.items.map((item: any) => item.str).join(' ');
+                    textContent += text + '\n';
+                }
+            } else {
+                // Handle text files
+                textContent = await file.text();
+            }
+
+            // Send extracted text to API
+            const uploadData = new FormData();
+            uploadData.append('name', name);
+            uploadData.append('content', textContent);
+            uploadData.append('fileName', file.name);
+            uploadData.append('fileType', file.type);
+
             const res = await fetch("/api/resumes", {
                 method: "POST",
-                body: formData,
+                body: uploadData,
             });
 
             if (res.ok) {
