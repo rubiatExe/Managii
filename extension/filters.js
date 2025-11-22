@@ -1,33 +1,70 @@
 // Job filtering and categorization logic for Managify
-// Adapted from Python job scraper
+// Now supports ALL job types, not just tech roles
 
-// Keyword dictionaries for job categories
+// Keyword dictionaries for job categories (expanded)
 const keywordsDict = {
+    // Tech Roles
     'sde': ["software development", "software engineer", "software engineering",
         "software developer", "development", "backend engineer", "sde", "swe", "backend",
-        "frontend", "fullstack", "full", "stack", "front", "system", "systems",
-        "cloud", "devops", "application", "api", "platform", "site"],
+        "frontend", "fullstack", "full stack", "front end", "system", "systems",
+        "cloud", "devops", "application", "api", "platform", "site", "web developer"],
 
     'aiml': ["machine learning", "artificial intelligence", "ai", "ml", "mlops",
-        "cloud", "devops", "generative", "deep", "data", "applied"],
+        "deep learning", "data scientist", "data science", "generative ai"],
 
-    'cv': ["computer vision", "computer", "vision", "perception", "cv", "image", "object", "detection",
-        "autonomous"],
+    'cv': ["computer vision", "vision", "perception", "cv", "image processing",
+        "object detection", "autonomous"],
 
-    'nlp': ["nlp", "natural language processing", "llm", "generative", "linguist",
-        "language", "applied"],
+    'nlp': ["nlp", "natural language processing", "llm", "generative",
+        "linguist", "language model"],
 
     'robo': ["robotics", "robot", "mechatronics", "automation", "autonomous"],
+
+    'data': ["data analyst", "data engineer", "data analytics", "business intelligence",
+        "bi analyst", "tableau", "power bi", "sql", "etl", "data warehouse"],
+
+    // Business & Product Roles
+    'product': ["product manager", "product owner", "product management", "pm", "agile",
+        "scrum", "product strategy", "roadmap"],
+
+    'ux': ["ux designer", "ui designer", "user experience", "user interface",
+        "ux/ui", "interaction design", "visual design", "figma", "sketch"],
+
+    'marketing': ["marketing", "digital marketing", "content marketing", "seo", "sem",
+        "social media", "brand", "growth marketing", "performance marketing"],
+
+    'sales': ["sales", "business development", "account executive", "ae", "sdr",
+        "sales development", "account manager", "customer success"],
+
+    'finance': ["finance", "financial analyst", "accountant", "accounting", "fp&a",
+        "financial planning", "controller", "cfo", "bookkeeper"],
+
+    'hr': ["human resources", "hr", "recruiter", "recruiting", "talent acquisition",
+        "people operations", "hr generalist", "hr manager"],
+
+    'operations': ["operations", "operations manager", "supply chain", "logistics",
+        "project manager", "program manager", "process improvement"],
+
+    'healthcare': ["nurse", "nursing", "physician", "doctor", "medical", "healthcare",
+        "hospital", "clinic", "patient care", "rn", "lpn", "cna"],
+
+    'education': ["teacher", "teaching", "education", "professor", "instructor",
+        "tutor", "curriculum", "academic"],
+
+    'legal': ["lawyer", "attorney", "legal", "paralegal", "counsel", "law"],
 };
 
-// Patterns to ignore (filter out irrelevant jobs)
+// Patterns to ignore (much more permissive now)
 const ignoreDict = {
-    'title': ["staff", "sr.", "sr", "senior", "manager", "lead", "chief", "principal", "director",
-        "sales", "head", "mechanical", "ii", "iii", "iv", "l2", "l3", "2", "3", "4",
-        "management", "consultant", "phd", "manufacturing", "law", "maintenance",
-        "construction", "clearance", "structures", "helpdesk", "electrical", "propulsion",
-        "solution", "solutions", "customer"],
-    'description': ["clearance", "itar"]
+    'title': [
+        // Only filter out very clearly unwanted patterns
+        // Removed: "staff", "sr.", "senior", etc. (these are valid job levels)
+        // Removed: "manager", "lead" (these are valid roles too)
+    ],
+    'description': [
+        // Minimal filtering - only filter truly unwanted requirements
+        // Removed most restrictions
+    ]
 };
 
 // USA locations (states, abbreviations, major cities)
@@ -59,7 +96,7 @@ function isInUSA(location) {
  * Determine the category of a job based on keywords
  * @param {string} jobTitle - The job title
  * @param {string} jobDescription - The job description
- * @returns {string|null} - Category key (sde, aiml, cv, nlp, robo) or null
+ * @returns {string|null} - Category key or null
  */
 function determineCategory(jobTitle, jobDescription) {
     if (!jobTitle && !jobDescription) return null;
@@ -79,15 +116,16 @@ function determineCategory(jobTitle, jobDescription) {
         scores[category] = score;
     }
 
-    // Return category with highest score, or null if no matches
+    // Return category with highest score, or 'other' if no matches
     const maxScore = Math.max(...Object.values(scores));
-    if (maxScore === 0) return null;
+    if (maxScore === 0) return 'other'; // Changed from null to 'other'
 
     return Object.keys(scores).find(key => scores[key] === maxScore);
 }
 
 /**
  * Check if a job is relevant based on keywords and ignore patterns
+ * NOW ACCEPTS ALL JOBS BY DEFAULT - only filters very specific unwanted patterns
  * @param {string} jobTitle - The job title
  * @param {string} jobDescription - The job description
  * @returns {boolean} - True if job is relevant
@@ -114,16 +152,9 @@ function isRelevantRole(jobTitle, jobDescription) {
         }
     }
 
-    // Check if title or description contains relevant keywords
-    const allKeywords = Object.values(keywordsDict).flat();
-    for (const keyword of allKeywords) {
-        const keywordLower = keyword.toLowerCase();
-        if (titleLower.includes(keywordLower) || descLower.includes(keywordLower)) {
-            return true;
-        }
-    }
-
-    return false; // No matching keywords found
+    // CHANGED: Now accepts ALL jobs by default
+    // No longer requires matching specific keywords
+    return true;
 }
 
 /**
@@ -133,11 +164,28 @@ function isRelevantRole(jobTitle, jobDescription) {
  */
 function getCategoryInfo(category) {
     const categoryMap = {
+        // Tech categories
         'sde': { name: 'Software Dev', color: '#3b82f6' },      // blue
         'aiml': { name: 'AI/ML', color: '#8b5cf6' },            // purple
         'cv': { name: 'Computer Vision', color: '#ec4899' },     // pink
         'nlp': { name: 'NLP', color: '#10b981' },               // green
-        'robo': { name: 'Robotics', color: '#f59e0b' }          // amber
+        'robo': { name: 'Robotics', color: '#f59e0b' },          // amber
+        'data': { name: 'Data', color: '#06b6d4' },              // cyan
+
+        // Business categories
+        'product': { name: 'Product', color: '#f97316' },        // orange
+        'ux': { name: 'UX/UI Design', color: '#d946ef' },        // fuchsia
+        'marketing': { name: 'Marketing', color: '#84cc16' },     // lime
+        'sales': { name: 'Sales', color: '#22c55e' },            // green
+        'finance': { name: 'Finance', color: '#eab308' },        // yellow
+        'hr': { name: 'HR', color: '#a855f7' },                  // purple
+        'operations': { name: 'Operations', color: '#6366f1' },   // indigo
+
+        // Other categories
+        'healthcare': { name: 'Healthcare', color: '#ef4444' },   // red
+        'education': { name: 'Education', color: '#14b8a6' },     // teal
+        'legal': { name: 'Legal', color: '#64748b' },            // slate
+        'other': { name: 'Other', color: '#6b7280' }              // gray
     };
 
     return categoryMap[category] || { name: 'Other', color: '#6b7280' }; // gray
