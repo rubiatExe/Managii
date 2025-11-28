@@ -403,8 +403,13 @@ function createFloatingButton() {
             button.classList.add('error');
 
             // Show specific error message
-            const errorMsg = error.message || 'Unknown error';
-            button.innerHTML = `<span style="font-size: 11px;">Error: ${errorMsg.substring(0, 50)}</span>`;
+            let errorMsg = error.message || 'Unknown error';
+
+            if (errorMsg.includes('Extension context invalidated')) {
+                errorMsg = "Please refresh page";
+            }
+
+            button.innerHTML = `<span style="font-size: 11px;">${errorMsg.substring(0, 50)}</span>`;
             button.appendChild(originalBadge);
 
             setTimeout(() => {

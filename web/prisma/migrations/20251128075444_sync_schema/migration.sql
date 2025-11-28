@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Job" ALTER COLUMN "userId" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Resume" ALTER COLUMN "userId" DROP DEFAULT;

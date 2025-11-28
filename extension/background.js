@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-    fetch('https://managii-dubo-4l4e0tdmh-rubiatexes-projects.vercel.app/api/jobs', {
+    fetch('http://localhost:3000/api/jobs', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

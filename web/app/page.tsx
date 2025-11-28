@@ -9,7 +9,7 @@ export default async function Home() {
   });
 
   // Serialize dates to strings for Client Component
-  const serializedJobs = jobs.map(job => ({
+  const serializedJobs = jobs.map((job: any) => ({
     ...job,
     createdAt: job.createdAt.toISOString(),
     updatedAt: job.updatedAt.toISOString(),

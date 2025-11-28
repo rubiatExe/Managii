@@ -1,0 +1,184 @@
+%-------------------------
+% Resume in Latex
+% Author : Jake Gutierrez
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins - AGGRESSIVE OPTIMIZATION FOR 11PT FIT
+\addtolength{\oddsidemargin}{-0.7in}
+\addtolength{\evensidemargin}{-0.7in}
+\addtolength{\textwidth}{1.4in}
+\addtolength{\topmargin}{-.7in}
+\addtolength{\textheight}{1.4in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-10pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-6pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-1pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[itemsep=-2pt, leftmargin=0.15in]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-6pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    \textbf{\Huge \scshape Rubiat Bin Faisal} \\ \vspace{2pt}
+    \small 201-736-9365 $|$ \href{mailto:rubiat.bin@gmail.com}{\underline{ rubiat.bin@gmail.com }} $|$ \href{ https://www.linkedin.com/in/rubiat-bin-faisal/ }{\underline{LinkedIn}} $|$ \href{ https://github.com/rubiatExe }{\underline{GitHub}}
+\end{center}
+
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      { Lehigh University }{  }
+      { Bachelor’s in Computer Science }{ 05/2025 }
+
+  \resumeSubHeadingListEnd
+
+
+
+%-----------SKILLS-----------
+\section{Technical Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+
+     \textbf{ Programming Languages }{: TypeScript, Javascript, Python, Java, C\textbackslash{}#, HTML5, CSS3,SQL}{% if not loop.last %} \\
+
+     \textbf{ Frameworks \textbackslash{}& Libraries }{: ReactJS, Next.js, Node.js, Express.js, Tailwind CSS, Unity Engine, Slack Block Kit}{% if not loop.last %} \\
+
+     \textbf{ Developer Tools \textbackslash{}& Platforms }{: AWS, Git, Vite, Webpack, npm/yarn, Figma, Jira, Agile/Scrum Methodologies}{% if not loop.last %} \\
+
+     \textbf{ Databases \textbackslash{}& APIs }{: PostgreSQL, RESTful APIs, OpenAI GPT API, Google Firebase}{% if not loop.last %} \\
+
+    }}
+ \end{itemize}
+{% endif %}
+
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      { Stealth Startup }{ New York, NY }
+      { Software Engineering Intern }{ 05/2024 - 08/2024 }
+      \resumeItemListStart
+{% for bullet in exp.bullets %}
+        \resumeItem{  }
+
+    \resumeSubheading
+      { Mentessa }{ San Francisco, CA }
+      { Software Engineering Intern }{ 05/2023 - 08/2023 }
+      \resumeItemListStart
+{% for bullet in exp.bullets %}
+        \resumeItem{  }
+
+    \resumeSubheading
+      { Lehigh RiVR Immersive Learning }{ Bethlehem, PA }
+      { Software Developer Intern }{ 05/2022 - 08/2022 }
+      \resumeItemListStart
+{% for bullet in exp.bullets %}
+        \resumeItem{  }
+
+    \resumeSubheading
+      { Save Tuba }{ Bethlehem, PA }
+      { Software Engineering Team Lead }{ 12/2020 - 12/2021 }
+      \resumeItemListStart
+{% for bullet in exp.bullets %}
+        \resumeItem{  }
+
+      \resumeItemListEnd
+{% endfor %}
+  \resumeSubHeadingListEnd
+
+
+
+%-----------PROJECTS-----------
+\section{Projects}
+    \resumeSubHeadingListStart
+
+      \resumeProjectHeading
+          {\textbf{ Managify: AI-Powered Job Application Tracker \textbackslash{}& Resume Tailor } $|$ \emph{ Next.js, TypeScript, PostgreSQL, Google Cloud SQL, Prisma ORM, JavaScript }}{{% if project.date %}{% endif %}}
+          \resumeItemListStart
+{% for bullet in project.bullets %}
+            \resumeItem{  }
+
+          \resumeItemListEnd
+{% endfor %}
+    \resumeSubHeadingListEnd
+{% endif %}
+
+\end{document}

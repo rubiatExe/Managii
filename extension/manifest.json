@@ -9,7 +9,9 @@
     "storage"
   ],
   "host_permissions": [
-    "https://managii-dubo-4l4e0tdmh-rubiatexes-projects.vercel.app/*"
+    "https://managii-dubo-4l4e0tdmh-rubiatexes-projects.vercel.app/*",
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*"
   ],
   "action": {
     "default_popup": "popup.html",

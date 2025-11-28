@@ -22,7 +22,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "No master resume found. Please upload one first." }, { status: 400 });
         }
 
-        const analysis = await analyzeFit(job.description, resume.content);
+        const analysis = await analyzeFit(job.description, resume.content, resume.skillsContext);
 
         // Update job with analysis
         await prisma.job.update({

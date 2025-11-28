@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-
+import getServerSession from "next-auth";
+import { authOptions } from "@/lib/auth";
 // CORS headers for Chrome extension
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -15,6 +16,24 @@ export async function OPTIONS() {
 
 export async function POST(request: Request) {
     try {
+        let userId: string | undefined;
+        const session = await getServerSession(authOptions) as any;
+
+        if (session?.user?.id) {
+            userId = session.user.id;
+        } else {
+            // Fallback to default user for extension/local dev
+            const defaultUser = await prisma.user.findFirst();
+            if (defaultUser) {
+                console.warn("⚠️ Unauthenticated request to POST /api/jobs. Using default user:", defaultUser.id);
+                userId = defaultUser.id;
+            }
+        }
+
+        if (!userId) {
+            return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+        }
+
         const body = await request.json();
         const { title, company, description, url, location, category, isRelevant } = body;
 
@@ -44,6 +63,7 @@ export async function POST(request: Request) {
 
         const job = await prisma.job.create({
             data: {
+                userId,
                 title,
                 company: company || "Unknown",
                 description: description || "",
@@ -67,11 +87,30 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
     try {
+        let userId: string | undefined;
+        const session = await getServerSession(authOptions) as any;
+
+        if (session?.user?.id) {
+            userId = session.user.id;
+        } else {
+            // Fallback to default user
+            const defaultUser = await prisma.user.findFirst();
+            if (defaultUser) {
+                userId = defaultUser.id;
+            }
+        }
+
+        if (!userId) {
+            return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+        }
+
         const { searchParams } = new URL(request.url);
         const category = searchParams.get('category');
         const isRelevant = searchParams.get('isRelevant');
 
-        const where: any = {};
+        const where: any = {
+            userId // Filter by user
+        };
         if (category) where.category = category;
         if (isRelevant !== null) where.isRelevant = isRelevant === 'true';
 
